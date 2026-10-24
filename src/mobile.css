@@ -1,0 +1,153 @@
+/*
+ * WhatsApp Web mobile layer. Everything is scoped to html[data-wam], which
+ * mobile.js only sets at phone widths, so wide windows keep the desktop layout.
+ * Column elements are tagged by mobile.js (data-wam-col / -row / -chain).
+ */
+
+html[data-wam],
+html[data-wam] body {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Chat UI is app-like: no page scroll or pull-to-refresh. (Login page must still scroll.) */
+html[data-wam][data-wam-ready],
+html[data-wam][data-wam-ready] body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+html[data-wam] #app {
+  height: var(--wam-vh, 100dvh) !important;
+  min-width: 0 !important;
+}
+
+/* Login / loading screens: their cards have fixed desktop min-widths (580px+). */
+html[data-wam]:not([data-wam-ready]) #app * {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+/* Desktop wrapper between #app and the column row: drop min-widths, the centred
+   max-width box and the top/bottom gutters used on large monitors. */
+html[data-wam] [data-wam-chain] {
+  min-width: 0 !important;
+  max-width: none !important;
+  width: 100% !important;
+  height: 100% !important;
+  top: 0 !important;
+  left: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+
+/* ---------- single-pane stack ---------- */
+
+html[data-wam] [data-wam-row] {
+  position: relative !important;
+  display: flex !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  overflow: hidden !important;
+}
+
+html[data-wam] [data-wam-col] {
+  min-width: 0 !important;
+  max-width: none !important;
+}
+
+html[data-wam] [data-wam-col="rail"] {
+  flex: 0 0 auto !important;
+}
+
+html[data-wam] [data-wam-col="side"] {
+  flex: 1 1 auto !important;
+  width: auto !important;
+}
+
+/* Conversation and drawers become full-screen sheets that slide in from the right. */
+html[data-wam] [data-wam-col="main"],
+html[data-wam] [data-wam-col="drawer"] {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  flex: none !important;
+  transform: translate3d(100%, 0, 0);
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+}
+
+html[data-wam] [data-wam-col="main"] {
+  z-index: 50;
+  background: var(--WDS-surface-default, #efeae2);
+}
+
+html[data-wam] [data-wam-col="drawer"] {
+  z-index: 60;
+}
+
+html[data-wam][data-wam-view="chat"] [data-wam-col="main"],
+html[data-wam][data-wam-view="drawer"] [data-wam-col="main"],
+html[data-wam][data-wam-view="drawer"] [data-wam-col="drawer"] {
+  transform: none;
+}
+
+/* Nav rail outside the row (newer builds) isn't covered by the sheet: hide it. */
+html[data-wam]:not([data-wam-view="list"]) [data-wam-col="rail-outer"] {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-wam] [data-wam-col="main"],
+  html[data-wam] [data-wam-col="drawer"] {
+    transition: none;
+  }
+}
+
+/* ---------- conversation ---------- */
+
+/* Room for the injected back button. */
+html[data-wam][data-wam-view="chat"] #main header {
+  padding-left: 48px !important;
+}
+
+#wam-back {
+  display: none;
+}
+
+html[data-wam][data-wam-view="chat"] #wam-back:not([hidden]) {
+  position: fixed;
+  left: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* 16px stops iOS zooming into the composer; mobile browsers hide the caret otherwise. */
+html[data-wam] footer [contenteditable="true"],
+html[data-wam] #side [contenteditable="true"] {
+  font-size: 16px !important;
+}
+
+/* Bubbles can use more of a narrow screen. */
+html[data-wam] .message-in > div,
+html[data-wam] .message-out > div {
+  max-width: 88% !important;
+}
+
+/* Hover-only affordances (e.g. the message menu chevron) need to be reachable by tap. */
+@media (hover: none) {
+  html[data-wam] #main [data-icon="down-context"],
+  html[data-wam] #main [data-icon="ic-chevron-down-menu"] {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+}

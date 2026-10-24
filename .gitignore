@@ -1,0 +1,7 @@
+node_modules/
+.profile/
+dist/
+data/
+.env
+*.png
+!web/*.png

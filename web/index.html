@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta name="theme-color" content="#0b8a5b" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b141a" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Chats">
+  <title>Chats</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icon-180.png">
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body data-screen="boot">
+
+  <!-- App login -->
+  <section id="auth" class="screen center">
+    <form id="auth-form" class="card">
+      <img src="/icon.svg" alt="" width="64" height="64">
+      <h1>Chats</h1>
+      <p class="muted">Enter your app password.</p>
+      <input id="auth-password" type="password" autocomplete="current-password" placeholder="Password" required>
+      <button class="primary" type="submit">Unlock</button>
+      <p id="auth-error" class="error" role="alert"></p>
+    </form>
+  </section>
+
+  <!-- WhatsApp linking / status -->
+  <section id="link" class="screen center">
+    <div class="card">
+      <h1>Link WhatsApp</h1>
+      <p id="link-status" class="muted">Starting…</p>
+      <img id="link-qr" alt="QR code to link WhatsApp" hidden>
+      <div id="link-pair" hidden>
+        <p class="muted small">On this phone? Link with your number instead:</p>
+        <form id="pair-form" class="row">
+          <input id="pair-phone" type="tel" inputmode="tel" placeholder="Phone incl. country code" autocomplete="tel" required>
+          <button class="primary" type="submit">Get code</button>
+        </form>
+        <p id="pair-code" class="code" hidden></p>
+        <p id="pair-help" class="muted small" hidden>In WhatsApp: Settings → Linked devices → Link a device → <b>Link with phone number instead</b>, then enter this code.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chat list -->
+  <section id="list" class="screen">
+    <header class="bar">
+      <h1 class="bar-title">Chats</h1>
+      <span id="conn" class="conn" title="Connection"></span>
+      <button id="menu-btn" class="icon-btn" aria-label="Menu" type="button">
+        <svg viewBox="0 0 24 24"><path d="M12 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>
+      </button>
+    </header>
+    <div class="search">
+      <input id="search" type="search" placeholder="Search" autocomplete="off" enterkeyhint="search">
+    </div>
+    <ul id="chats" class="chats" aria-label="Chats"></ul>
+    <p id="chats-empty" class="muted center-text" hidden>Loading chats…</p>
+  </section>
+
+  <!-- Conversation -->
+  <section id="chat" class="screen sheet" aria-hidden="true">
+    <header class="bar">
+      <button id="back-btn" class="icon-btn" aria-label="Back" type="button">
+        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      </button>
+      <span id="chat-avatar" class="avatar sm"></span>
+      <div class="bar-text">
+        <div id="chat-name" class="bar-title"></div>
+        <div id="chat-sub" class="bar-sub"></div>
+      </div>
+    </header>
+    <div id="messages" class="messages">
+      <button id="load-more" class="pill" type="button" hidden>Load earlier messages</button>
+      <div id="message-list"></div>
+    </div>
+    <div id="reply-bar" class="reply-bar" hidden>
+      <div class="quote"><div id="reply-text"></div></div>
+      <button id="reply-cancel" class="icon-btn" aria-label="Cancel reply" type="button">
+        <svg viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </button>
+    </div>
+    <form id="composer" class="composer">
+      <button id="attach-btn" class="icon-btn" aria-label="Attach" type="button">
+        <svg viewBox="0 0 24 24"><path d="M16.5 6v11.5a4 4 0 0 1-8 0V5a2.5 2.5 0 0 1 5 0v10.5a1 1 0 0 1-2 0V6H10v9.5a2.5 2.5 0 0 0 5 0V5a4 4 0 0 0-8 0v12.5a5.5 5.5 0 0 0 11 0V6h-1.5z"/></svg>
+      </button>
+      <input id="attach-input" type="file" hidden>
+      <textarea id="composer-input" rows="1" placeholder="Message" enterkeyhint="send" aria-label="Message"></textarea>
+      <button id="send-btn" class="send-btn" aria-label="Send" type="submit">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </form>
+  </section>
+
+  <!-- Menu -->
+  <dialog id="menu" class="menu">
+    <form method="dialog">
+      <button id="menu-notify" type="button">Enable notifications</button>
+      <button id="menu-lock" type="button">Lock app</button>
+      <button id="menu-unlink" type="button" class="danger">Unlink WhatsApp</button>
+      <button value="close">Close</button>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="/app.js" type="module"></script>
+</body>
+</html>

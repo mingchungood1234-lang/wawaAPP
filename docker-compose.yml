@@ -1,0 +1,19 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    init: true             # reaps Chromium child processes left behind after a restart
+    env_file: .env
+    environment:
+      WA_NO_SANDBOX: "1"   # Chromium's sandbox needs privileges containers don't grant by default
+    volumes:
+      - wa_data:/data      # WhatsApp session, push keys, app secret
+    shm_size: 128mb        # Chromium uses /tmp instead (--disable-dev-shm-usage)
+    logging:
+      options: { max-size: "10m", max-file: "3" }
+    # Only reachable from the VPS itself; nginx forwards to it (see deploy/nginx.conf).
+    ports:
+      - "127.0.0.1:${APP_PORT:-3000}:3000"
+
+volumes:
+  wa_data:

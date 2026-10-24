@@ -1,0 +1,10 @@
+node_modules
+data
+.profile
+dist
+dev
+src
+scripts
+.env
+*.png
+!web/*.png
