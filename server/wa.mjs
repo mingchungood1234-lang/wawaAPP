@@ -74,6 +74,9 @@ export class WhatsApp extends EventEmitter {
       // Browser profile lands in <dataDir>/session. Keep dataDir short on Windows:
       // Chrome's IndexedDB paths inside it break past MAX_PATH (260 chars).
       authStrategy: new LocalAuth({ dataPath: this.dataDir }),
+      // The default cache dir is ./.wwebjs_cache, which isn't writable in the container
+      // (/app is root-owned). A failed write there hangs startup after 'authenticated'.
+      webVersionCache: { type: 'local', path: join(this.dataDir, 'wwebjs_cache') },
       puppeteer: { headless: true, args: chromiumArgs() },
       userAgent: await desktopUserAgent(),
     });
@@ -138,7 +141,10 @@ export class WhatsApp extends EventEmitter {
 
   setState(patch) {
     this.state = { ...this.state, ...patch };
-    if (patch.status !== 'loading') console.log('[wa] status:', this.state.status);
+    if (patch.status !== 'loading') {
+      const detail = patch.reason || patch.error;
+      console.log('[wa] status:', this.state.status + (detail ? ` (${detail})` : ''));
+    }
     this.emit('event', { type: 'status', state: this.state });
   }
 

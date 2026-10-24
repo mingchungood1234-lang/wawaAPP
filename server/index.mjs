@@ -210,6 +210,10 @@ wa.on('event', (event) => {
 server.listen(PORT, () => console.log(`[server] http://localhost:${PORT}`));
 wa.start().catch((err) => wa.fail(err));
 
+// whatsapp-web.js fires un-awaited page work (e.g. re-injecting on navigation) that can
+// reject after the browser closes during a restart; log it instead of killing the server.
+process.on('unhandledRejection', (err) => console.error('[unhandled]', err?.message || err));
+
 for (const sig of ['SIGINT', 'SIGTERM']) {
   process.on(sig, async () => {
     await wa.client?.destroy().catch(() => {});
