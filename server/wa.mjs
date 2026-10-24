@@ -85,7 +85,11 @@ export class WhatsApp extends EventEmitter {
     c.on('code', (code) => this.setState({ status: 'qr', code }));
     c.on('authenticated', () => this.setState({ status: 'authenticated', qr: null, code: null }));
     c.on('auth_failure', (msg) => this.setState({ status: 'auth_failure', error: String(msg) }));
-    c.on('loading_screen', (percent) => this.setState({ status: 'loading', percent }));
+    // Also fires after 'ready' while offline messages sync; the client is usable by then,
+    // so don't drop back to 'loading' (and block the API) once ready.
+    c.on('loading_screen', (percent) => {
+      if (this.state.status !== 'ready') this.setState({ status: 'loading', percent });
+    });
     c.on('ready', () => {
       this.setState({ status: 'ready', qr: null, code: null, me: c.info?.wid?._serialized ?? null });
     });
