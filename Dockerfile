@@ -13,6 +13,8 @@ ENV NODE_ENV=production \
 
 WORKDIR /app
 COPY package.json package-lock.json ./
+# Fixes for whatsapp-web.js applied by patch-package on install (postinstall).
+COPY patches ./patches
 RUN npm ci --omit=dev && npm cache clean --force
 COPY server ./server
 COPY web ./web

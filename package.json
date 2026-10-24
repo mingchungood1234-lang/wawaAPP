@@ -7,13 +7,15 @@
   "scripts": {
     "start": "node server/index.mjs",
     "dev": "node dev/launch.mjs",
-    "build": "node scripts/build.mjs"
+    "build": "node scripts/build.mjs",
+    "postinstall": "patch-package"
   },
   "devDependencies": {
     "playwright": "^1.50.0"
   },
   "dependencies": {
     "express": "^4.22.3",
+    "patch-package": "^8.0.0",
     "puppeteer": "24.38.0",
     "qrcode": "^1.5.4",
     "web-push": "^3.6.7",
